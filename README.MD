@@ -1,4 +1,4 @@
-# Desafio implementador fullstack
+﻿# Desafio implementador fullstack
 
 Seja parte da jornada de transformação digital no Brasil.
 
@@ -79,3 +79,5 @@ Em caso de dúvidas, envie um email para [g_cpa_squad_produto@softplan.com.br](m
 
 
 **Até breve**
+
+
