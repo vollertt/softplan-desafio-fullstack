@@ -3,6 +3,7 @@ package com.desafiosoftplan.apirest.models;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -27,18 +28,23 @@ public class Usuario implements Serializable{
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long cd_usuario;
 	@NotNull
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private PerfilUsuario perfilUsuario;
 	@NotNull
+	@Column(nullable = false)
     private boolean status;
 	@NotNull
+	@Column(nullable = false)
 	@Length(max = 50)  
 	private String email;
 	@NotNull
+	@Column(nullable = false)
 	@Length(max = 100)  
 	private String nome;
 	@NotNull
-	@Temporal(TemporalType.DATE)
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dt_cadastro;
 	
 	
@@ -78,6 +84,7 @@ public class Usuario implements Serializable{
 	public void setDt_cadastro(Date dt_cadastro) {
 		this.dt_cadastro = dt_cadastro;
 	}
+
 	
     
 }

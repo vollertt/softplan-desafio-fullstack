@@ -1,8 +1,10 @@
 package com.desafiosoftplan.apirest.models;
 
 import java.io.Serializable;
+
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,7 +20,7 @@ import com.sun.istack.NotNull;
 
 @Entity
 @Table(name="processo")
-public class Processos implements Serializable{
+public class Processo implements Serializable{
 	
     private static final long serialVersionUID = 1L;
 	
@@ -26,25 +28,31 @@ public class Processos implements Serializable{
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long cd_processo;
 	@NotNull
+	@Column(nullable = false)
 	@Length(max = 30)  
 	private String num_processo;
 	@NotNull
+	@Column(nullable = false)
 	private String ds_processo;
 	@Length(max = 5000)  
 	private String parecer;
 	@NotNull
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dt_parecer_inc;
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dt_parecer_mod;
 	@NotNull
+	@Column(nullable = false)
 	private boolean status_finalizado=false;		
 	@NotNull
-    @JoinColumn(name="cd_usuario_cadastro")
-	private Usuario usuarioCadastro;
+	@Column(name = "cd_usuario_cadastro", nullable = false)
+    @JoinColumn(name="cd_usuario")
+	private long cd_usuario_cadastro;
 	@NotNull
-	@JoinColumn(name="cd_usuario_finaliza")
-	private Usuario usuarioFinaliza;
+	@Column(name = "cd_usuario_finaliza", nullable = false)
+	@JoinColumn(name="cd_usuario")
+	private long cd_usuario_finaliza;
+	
 	
 	public long getCd_processo() {
 		return cd_processo;
@@ -88,20 +96,18 @@ public class Processos implements Serializable{
 	public void setStatus_finalizado(boolean status_finalizado) {
 		this.status_finalizado = status_finalizado;
 	}
-	public Usuario getUsuarioCadastro() {
-		return usuarioCadastro;
+	public long getCd_usuario_cadastro() {
+		return cd_usuario_cadastro;
 	}
-	public void setUsuarioCadastro(Usuario usuarioCadastro) {
-		this.usuarioCadastro = usuarioCadastro;
+	public void setCd_usuario_cadastro(long cd_usuario_cadastro) {
+		this.cd_usuario_cadastro = cd_usuario_cadastro;
 	}
-	public Usuario getUsuarioFinaliza() {
-		return usuarioFinaliza;
+	public long getCd_usuario_finaliza() {
+		return cd_usuario_finaliza;
 	}
-	public void setUsuarioFinaliza(Usuario usuarioFinaliza) {
-		this.usuarioFinaliza = usuarioFinaliza;
+	public void setCd_usuario_finaliza(long cd_usuario_finaliza) {
+		this.cd_usuario_finaliza = cd_usuario_finaliza;
 	}
-	
-	
-	
+		
 
 }

@@ -9,4 +9,3 @@ VALUES
 (6, now(), 'teste5@teste.com', 'teste5', 'DISTRIBUIDOR', true),
 (7, now(), 'teste6@teste.com', 'teste6', 'FINALIZADOR', true),
 (8, now(), 'teste7@teste.com', 'teste7', 'FINALIZADOR', true);
-	
