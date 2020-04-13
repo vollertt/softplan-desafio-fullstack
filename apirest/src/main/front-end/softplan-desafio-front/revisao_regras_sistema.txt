@@ -1,0 +1,16 @@
+Revisao de regras de negocio
+
+Tela Inicial: usuários do sistema
+
+  Admin: pode cadastrar, ver e alterar dados do usuário após logar
+
+  Distribuidor: (triagem) e Finalizador (parecer) só podem ver lista dos usuários na tela inicial após logar
+
+
+Tela de Processos
+
+  Admin: pode apenas ver tabela dos processos sem poder alterar nada deste item
+
+  Distribuidor: pode apenas cadastrar processos atribuido ao seu usuário para um Finalizador e visualizar os processos cadastrados
+
+  Finalizador: Não pode cadastrar processo, e pode apenas editar (dar parecer) dos processos atribuidos ao seu usuário
