@@ -11,14 +11,14 @@ import com.desafiosoftplan.apirest.models.Processo;
 public interface ProcessoRepository extends JpaRepository<Processo, Long>{
 	
     Processo findById(long cd_processo);    
-    
+        
     @Query(value="SELECT * FROM processo WHERE num_processo like :numProcesso" , nativeQuery = true) 
     Processo findByNumeroProcesso(@Param("numProcesso") String numProcesso);    
     
     @Query(value="SELECT * FROM processo WHERE Lower(ds_processo) like Lower(:dsProcesso)" , nativeQuery = true) 
-    List<Processo> findByDescricaoProcesso(@Param("dsProcesso") String dsProcesso);    
+    List<Processo> findByDescricaoProcesso(@Param("dsProcesso") String dsProcesso);  
     
-    @Query(value="SELECT * FROM processo WHERE cd_usuario_finaliza = :cd_usuario_finaliza" , nativeQuery = true) 
-    List<Processo> findByUsuarioParecer(@Param("cd_usuario_finaliza") long cd_usuario_finaliza); 
+    @Query(value="SELECT * FROM processo p, usuario u WHERE ( (p.cd_usuario_finaliza = u.cd_usuario or  p.cd_usuario_cadastro = u.cd_usuario) and u.email like :email )  " , nativeQuery = true) 
+    List<Processo> findByUsuarioLogin(@Param("email") String email); 
 
 }

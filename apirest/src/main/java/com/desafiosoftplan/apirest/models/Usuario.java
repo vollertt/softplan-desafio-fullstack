@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -24,7 +25,7 @@ public class Usuario implements Serializable{
 	
     private static final long serialVersionUID = 1L;
 	
-	@Id
+	@Id 
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long cd_usuario;
 	@NotNull
@@ -37,10 +38,12 @@ public class Usuario implements Serializable{
 	@NotNull
 	@Column(nullable = false)
 	@Length(max = 50)  
+	@Size(min = 8, max = 50)
 	private String email;
 	@NotNull
 	@Column(nullable = false)
 	@Length(max = 100)  
+	@Size(min = 3, max = 100)
 	private String nome;
 	@NotNull
 	@Column(nullable = false)
