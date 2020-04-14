@@ -30,7 +30,7 @@
               <button @click="pesquisarUsuario()" class="waves-effect btn-small blue darken-1 btSearch"><i class="material-icons center iconSearch">search</i></button>              
             </div>
           </div>      
-          <div id="modalUser" class="modal modalUser">
+          <div id="modalUser" class="modal modalUser" v-if="this.usuarioLogin.perfilUsuario==='ADMIN'">
             <div class="modal-content">
                   <h5>Cadastro de Usuário</h5>
                   <ul>
@@ -61,8 +61,8 @@
                   </form>
             </div>        
           </div> 
-          <div style="display:block">
-           <span style="text-align: center;display:block;font-size:17px;font-weight:bold;">Lista de Usuários</span>        
+          <div style="display:block;position:relative;top:30px;">
+          <center><label class="titleTab">Lista de Usuários</label></center>       
           <table>
             <thead>
               <tr>
@@ -94,7 +94,7 @@
           <div>   
             <button v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" data-target="modalProcesso" class="modal-trigger addProcess"><i class="large material-icons iconProcess">book</i>+[{{title}}]</button>                 
           </div>      
-          <div id="modalProcesso" class="modal modalProcesso">
+          <div v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" id="modalProcesso" class="modal modalProcesso">
             <div class="modal-content">
                   <h5>Cadastro de Processo</h5>
                   <ul>
@@ -133,8 +133,8 @@
 
             </div>        
           </div>  
-          <br>  
-          <span style="text-align: center;display:block;font-size:17px;font-weight:bold;">Lista de Processos</span>      
+          <br> 
+          <center><label class="titleTab">Lista de Processos</label></center>     
           <table>
             <thead>
               <tr>
@@ -225,55 +225,54 @@ export default {
   
   
   methods: {    
-    /* Método para Alterar de Cadastro de usuário para de Processos */
-    linkPro(){
-      if(this.linkProd==='Processos'){
-         this.linkProd='Usuários';
-         this.title='Cadastro de Processos';
-         this.usuarios=[];
-         this.usuario=[];
-         this.listarProcesso();         
-      }else{
-         this.linkProd='Processos';
-         this.title='Cadastro de Usuários';
-         this.listarUsuario();         
-      }
-    },
 
-    showModal: function(id) {      
-      document.getElementById(id).style.display='initial'
-      if(this.linkProd==='Processos'){
-        if(!this.usuario.cd_usuario){
-          document.getElementById('status').style.display='none'
-          this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
-          this.errors=[]
+       /* Método para Alterar de Cadastro de usuário para de Processos */
+      linkPro(){
+        if(this.linkProd==='Processos'){
+          this.linkProd='Usuários';
+          this.title='Cadastro de Processos';
+          this.usuarios=[];
+          this.usuario=[];
+          this.listarProcesso();         
         }else{
-          document.getElementById('status').style.display='initial'
+          this.linkProd='Processos';
+          this.title='Cadastro de Usuários';
+          this.listarUsuario();         
         }
-        console.log(this.usuario)        
-      }else{
-        if(!this.processo.cd_processo){
+      },
+
+      showModal: function(id) {      
+        document.getElementById(id).style.display='initial'
+        if(this.linkProd==='Processos'){
+          if(!this.usuario.cd_usuario){
+            document.getElementById('status').style.display='none'
+            this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+            this.errors=[]
+          }else{
+            document.getElementById('status').style.display='initial'
+          }  
+        }else{
+          if(!this.processo.cd_processo){
+            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
+            this.errors=[]
+          }
+        }
+      },
+
+      closeModal: function(id) {
+        if(this.linkProd==='Processos'){
+            this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+        }else{
           this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
-          this.errors=[]
         }
-      }
-     },
+        this.errors=[]
+        document.getElementById(id).style.display='none'
+      },
 
-     closeModal: function(id) {
-       if(this.linkProd==='Processos'){
-          this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
-       }else{
-         this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
-       }
-       this.errors=[]
-       document.getElementById(id).style.display='none'
-     },
-
-
-    /*
-    * Métodos Listar, Pesquisar, salvar e atualizar associados com a entidade Usuário e os serviços Spring Rest
-    */          
-           
+          /*
+          * Métodos Listar, Pesquisar, salvar e atualizar associados com a 
+          * entidade Usuário e os serviços Spring Rest
+          */   
           buscarUsuarioLogin(){
             this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
             this.usuarioLogin={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
@@ -294,7 +293,6 @@ export default {
           },
           
           listarUsuario(){
-            console.log(this.usuarioLogin.cd_usuario)
             if(this.usuarioLogin.cd_usuario>0){
               Usuario.listarUsuario().then(resposta => {
                 this.usuarios = resposta.data
@@ -364,82 +362,80 @@ export default {
             },    
 
 
-       /*
-        * Métodos Listar, Pesquisar, salvar e atualizar associados com a entidade Processo e os serviços Spring Boot JPA / Rest
-       */
-          listarProcesso(){
-            if(this.usuarioLogin.perfilUsuario!=='ADMIN'){
-              Processo.pesquisarProcessoUsuarioLogin(this.usuarioLogin.email).then(resposta => {
-                this.processos = resposta.data
-              })
-              if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
-                Usuario.listaUsuarioPerfil('FINALIZADOR').then(resposta => {
-                  this.usuariosPerfil = resposta.data
+            /*
+            *  Métodos Listar, Pesquisar, salvar e atualizar associados com a entidade 
+            *  Processo e os serviços Spring Boot JPA / Rest
+            */
+            listarProcesso(){
+              if(this.usuarioLogin.perfilUsuario!=='ADMIN'){
+                Processo.pesquisarProcessoUsuarioLogin(this.usuarioLogin.email).then(resposta => {
+                  this.processos = resposta.data
+                })
+                if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
+                  Usuario.listaUsuarioPerfil('FINALIZADOR').then(resposta => {
+                    this.usuariosPerfil = resposta.data
+                  })
+                }
+              }else{
+                Processo.listarProcesso().then(resposta => {
+                  this.processos = resposta.data
                 })
               }
-            }else{
-              Processo.listarProcesso().then(resposta => {
-                this.processos = resposta.data
-              })
-            }
-          },          
+            },          
 
-          salvarProcesso(){            
-              this.errors = []
-              if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
-                  if (!this.processo.num_processo) {
-                    this.errors.push('Número é obrigatório');
-                  }        
-                  if (!this.processo.ds_processo) {
-                    this.errors.push('Descrição é Obrigatório');
-                  }
-                  if (!this.selectedUsuarioPerfil) {
-                    this.errors.push('Usuário é obrigatório');
-                  }        
-               }
-               if(this.usuarioLogin.perfilUsuario==='FINALIZADOR'){
-                  if (!this.processo.parecer) {
-                    this.errors.push('Parecer é obrigatório');
-                  }     
-              }
+            salvarProcesso(){            
+                this.errors = []
+                if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
+                    if (!this.processo.num_processo) {
+                      this.errors.push('Número é obrigatório');
+                    }        
+                    if (!this.processo.ds_processo) {
+                      this.errors.push('Descrição é Obrigatório');
+                    }
+                    if (!this.selectedUsuarioPerfil) {
+                      this.errors.push('Usuário é obrigatório');
+                    }        
+                }
+                if(this.usuarioLogin.perfilUsuario==='FINALIZADOR'){
+                    if (!this.processo.parecer) {
+                      this.errors.push('Parecer é obrigatório');
+                    }     
+                }
+                if(this.errors.length===0){
+                    if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
+                      this.processo.usuarioFinaliza={cd_usuario:this.selectedUsuarioPerfil}
+                      this.processo.usuarioCadastro=this.usuarioLogin
+                    }
+                    if(!this.processo.cd_processo){
+                      Processo.salvarProcesso(this.processo).then(response => {
+                        response
+                        this.processo={}
+                        alert('Salvo com sucesso!')
+                        this.listarProcesso()
+                        this.closeModal('modalProcesso')
+                      }).catch(error => {
+                          console.log(error)
+                      })
+                    }else{ 
+                      this.errors=[]                    
+                      Processo.atualizarProcesso(this.processo).then(resposta => {
+                        resposta
+                        this.processo={}            
+                        alert('Atualizado com sucesso!')
+                        this.listarProcesso()
+                        this.closeModal('modalProcesso')
+                      }).catch((error) => {
+                          console.log(error)
+                      })
+                    }
+                }
 
-              if(this.errors.length===0){
-                  if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
-                    this.processo.usuarioFinaliza={cd_usuario:this.selectedUsuarioPerfil}
-                    this.processo.usuarioCadastro=this.usuarioLogin
-                  }
-                  if(!this.processo.cd_processo){
-                    Processo.salvarProcesso(this.processo).then(response => {
-                      response
-                      this.processo={}
-                      alert('Salvo com sucesso!')
-                      this.listarProcesso()
-                      this.closeModal('modalProcesso')
-                    }).catch(error => {
-                        console.log(error)
-                    })
-                  }else{ 
-                    this.errors=[]                    
-                    Processo.atualizarProcesso(this.processo).then(resposta => {
-                      resposta
-                      this.processo={}            
-                      alert('Atualizado com sucesso!')
-                      this.listarProcesso()
-                      this.closeModal('modalProcesso')
-                    }).catch((error) => {
-                        console.log(error)
-                    })
-                  }
-              }
+              },
 
-            },
-
-            editarProcesso(processo){
-              this.showModal('modalProcesso')                    
-              this.processo=processo
-            },
-
-               
+              editarProcesso(processo){
+                this.showModal('modalProcesso')                    
+                this.processo=processo
+              }               
 
   }
 
@@ -453,12 +449,15 @@ export default {
   height:70px;
   font-size:20px;
 }
+.titleTab{
+  color:#000;font-size:17px;font-weight:bolder;
+}
 .addUser,.addProcess{
   font-size: 18px !important;
   color: #039be5;
   background: none !important;
   border: none;
-  cursor: pointer
+  cursor: pointer;
 }
 .iconUser,.iconProcess{
   font-size:55px !important;line-height:60px;
@@ -467,20 +466,16 @@ export default {
     padding: 12px;
 }
 .modalUser,.modalProcesso{
-  border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999
+  border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999;
 }
 .divSearch{
-    text-align: right;
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 20px;
-    margin-left: 200px;
+    float:right;
 }
 .iconSearch{
   font-size:24px !important;height:24px !important;line-height:24px !important;
 }
 .btSearch{
-  margin-left:20px;padding:5px
+  margin-left:20px;padding:5px;margin-right: 20px;
 }
 </style>
 
