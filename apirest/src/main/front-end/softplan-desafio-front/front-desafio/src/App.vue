@@ -22,7 +22,7 @@
 
     <div class="container">
       <!--Pagina da aplicação associada ao Cadastro de usuário -->
-      <div id="div-user" style="display:">  
+      <div id="div-user" v-if="this.linkProd==='Processos'" style="display:">  
           <div>         
             <a v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" v-on:click="showModal('modalUser')" class="addUser" href="#modalUser"><i class="large material-icons iconUser">account_circle</i>+[{{title}}]</a>            
             <div class="divSearch">              
@@ -90,7 +90,7 @@
       </div> 
 
       <!--Pagina da aplicação associada ao Cadastro de Processos -->
-      <div id="div-process" style="display:none">  
+      <div id="div-process" v-if="this.linkProd==='Usuários'" style="display:" >  
           <div>        
             <a v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" class="addProcess" href="#modalUser"><i class="large material-icons iconProcess">book</i>+[{{title}}]</a>
           </div>      
@@ -232,15 +232,11 @@ export default {
          this.title='Cadastro de Processos';
          this.usuarios=[];
          this.usuario=[];
-         this.listarProcesso();
-         document.getElementById('div-user').style.display='none';
-         document.getElementById('div-process').style.display='';
+         this.listarProcesso();         
       }else{
          this.linkProd='Processos';
          this.title='Cadastro de Usuários';
-         this.listarUsuario();
-         document.getElementById('div-user').style.display='';
-         document.getElementById('div-process').style.display='none';
+         this.listarUsuario();         
       }
     },
 
@@ -290,9 +286,7 @@ export default {
             this.linkProd='Processos'
             this.errors=[]
             this.processos=[]
-            this.usuarios=[];
-            document.getElementById('div-user').style.display='';
-            document.getElementById('div-process').style.display='none';
+            this.usuarios=[];            
             Usuario.buscarUsuarioLogin(this.emailLogin).then(resposta => {
               this.usuarioLogin = resposta.data
               this.listarUsuario()
@@ -441,8 +435,7 @@ export default {
             },
 
             editarProcesso(processo){
-              this.showModal('modalProcesso')  
-              //document.getElementById('status').style.display='initial'      
+              this.showModal('modalProcesso')                    
               this.processo=processo
             },
 
