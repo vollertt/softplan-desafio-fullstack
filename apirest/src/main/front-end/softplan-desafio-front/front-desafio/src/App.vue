@@ -57,7 +57,7 @@
                     </div>
                     <br><br>
                     <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" class="waves-effect waves-light btn-small blue ">Salvar<i class="material-icons left">save</i></button>
-                    <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" type="button" @click="closeModal('modalUser')" class="waves-effect waves-light btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
+                    <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" type="button" v-on:click="closeModal('modalUser')" class="waves-effect waves-light btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
                   </form>
             </div>        
           </div> 
@@ -78,7 +78,7 @@
                 <td>{{usuario.nome}}</td>
                 <td>{{usuario.email}}</td>
                 <td>{{usuario.perfilUsuario}}</td>
-                <td>{{usuario.status}}</td>
+                <td v-if="usuario.status===true">Ativo</td><td v-if="usuario.status===false">Desativado</td> 
                 <td>{{usuario.dt_cadastro}}</td>
                 <td>
                   <button v-if="usuarioLogin.perfilUsuario==='ADMIN'" @click="editarUsuario(usuario)" class="waves-effect btn-small blue"><i class="material-icons">create</i></button>
@@ -92,7 +92,7 @@
       <!--Pagina da aplicação associada ao Cadastro de Processos -->
       <div id="div-process" style="display:none">  
           <div>        
-            <a v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" class="addUser" href="#modalUser"><i class="large material-icons iconUser">book</i>+[{{title}}]</a>
+            <a v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" class="addProcess" href="#modalUser"><i class="large material-icons iconProcess">book</i>+[{{title}}]</a>
           </div>      
           <div id="modalProcesso" class="modal modalProcesso">
             <div class="modal-content">
@@ -101,7 +101,36 @@
                     <li v-for="(erro,index) of errors" :key="index">
                       <b>{{erro}}</b> 
                     </li>
-                  </ul>                  
+                  </ul>    
+
+                  <form @submit.prevent="salvarProcesso">
+                    <div v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'">
+                        <label>Numero Processo:</label>
+                        <input minlength="1" type="text" placeholder="Numero Processo" v-model="processo.num_processo">
+                        <label>Descrição:</label>
+                        <input minlength="10" type="text" placeholder="Descrição" v-model="processo.ds_processo">
+                        <label>Usuário FInaliza:</label>
+                        <select v-model="selectedUsuarioPerfil" name="usuarioFinaliza" style="display:initial !important" placeholder="Usuario Finaliza" id="usuarioFinaliza" >
+                          <option disabled value="" selected="selected">Please select one</option>
+                          <option v-for="(usuarioPerfil,index) in usuariosPerfil" 
+                                      :key="index" 
+                                      :value="usuarioPerfil.cd_usuario">Nome:{{usuarioPerfil.nome}}     -    Email:{{ usuarioPerfil.email }}</option>
+                        </select> 
+                    </div>      
+                    <div v-if="this.usuarioLogin.perfilUsuario==='FINALIZADOR'"> 
+                        <label>Parecer:</label>
+                        <textarea placeholder="Parecer" v-model="processo.parecer"></textarea>
+                        <label>Status:</label>
+                        <select style="display:initial" id='status_finalizado' placeholder="Status Parecer" v-model="processo.status_finalizado">
+                          <option value="true">Finalizado</option>
+                          <option selected value="false">Aberto (em análise)</option>
+                        </select>     
+                    </div>                        
+                    <br><br>
+                    <button class="waves-effect waves-light btn-small blue ">Salvar<i class="material-icons left">save</i></button>
+                    <button type="button" v-on:click="closeModal('modalProcesso')" class="waves-effect waves-light btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
+                  </form>
+
             </div>        
           </div>  
           <br>  
@@ -122,13 +151,13 @@
               <tr v-for="processo of processos" :key="processo.cd_processo">
                   <td>{{processo.num_processo}}</td>
                   <td>{{processo.ds_processo}}</td>                
-                  <td>{{processo.status_finalizado}}</td>               
+                  <td v-if="processo.status_finalizado===true">Finalizado</td><td v-if="processo.status_finalizado===false">Aberto</td>                
                   <td>{{processo.dt_parecer_inc}}</td>
                   <td>{{processo.parecer}}</td>
                   <td v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">{{processo.cd_usuario_cadastro}}</td>
                   <td v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">{{processo.cd_usuario_finaliza}}</td>
                   <td>
-                    <button v-if="usuarioLogin.perfilUsuario==='FINALIZADOR'" @click="editarProcesso(processo)" class="waves-effect btn-small blue"><i class="material-icons">create</i></button>
+                    <button v-if="usuarioLogin.perfilUsuario==='FINALIZADOR' && processo.status_finalizado===false" @click="editarProcesso(processo)" class="waves-effect btn-small blue"><i class="material-icons">create</i></button>
                 </td>
               </tr>
             </tbody>      
@@ -151,16 +180,16 @@ import Processo from './services/processos'
 export default {
 
   data(){
-     return{
-       usuarioLogin:{
+     return{       
+       usuario:{
          cd_usuario:'',
          nome:'',
          email:'',
          status:'',
          perfilUsuario:'',
          dt_cadastro:''
-       },
-       usuario:{
+       },       
+       usuarioLogin:{
          cd_usuario:'',
          nome:'',
          email:'',
@@ -178,8 +207,10 @@ export default {
          cd_usuario_cadastro:'',
          cd_usuario_finaliza:''
        },
+       selectedUsuarioPerfil:'',
        usuarios: [],
        processos:[],
+       usuariosPerfil:[],
        errors: [],
        searchField:'',
        emailLogin:'',
@@ -213,18 +244,32 @@ export default {
       }
     },
 
-    showModal: function(id) {
+    showModal: function(id) {      
       document.getElementById(id).style.display='initial'
-      if(!this.usuario.cd_usuario){
-        document.getElementById('status').style.display='none'
-        this.usuario={}
-        this.errors=[]
+      if(this.linkProd==='Processos'){
+        if(!this.usuario.cd_usuario){
+          document.getElementById('status').style.display='none'
+          this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+          this.errors=[]
+        }else{
+          document.getElementById('status').style.display='initial'
+        }
+        console.log(this.usuario)        
       }else{
-        document.getElementById('status').style.display='initial'
+        if(!this.processo.cd_processo){
+          this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',cd_usuario_cadastro:'',cd_usuario_finaliza:''}
+          this.errors=[]
+        }
       }
      },
+
      closeModal: function(id) {
-       this.usuario={}
+       if(this.linkProd==='Processos'){
+          this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+       }else{
+         this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',cd_usuario_cadastro:'',cd_usuario_finaliza:''}
+       }
+       this.errors=[]
        document.getElementById(id).style.display='none'
      },
 
@@ -234,6 +279,20 @@ export default {
     */          
            
           buscarUsuarioLogin(){
+            this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+            this.usuarioLogin={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+            this.usuariosPerfil={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
+            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',cd_usuario_cadastro:'',cd_usuario_finaliza:''}
+            this.selectedUsuarioPerfil=''
+            this.errors=[]
+            this.searchField=''
+            this.title='Cadastro de Usuário'
+            this.linkProd='Processos'
+            this.errors=[]
+            this.processos=[]
+            this.usuarios=[];
+            document.getElementById('div-user').style.display='';
+            document.getElementById('div-process').style.display='none';
             Usuario.buscarUsuarioLogin(this.emailLogin).then(resposta => {
               this.usuarioLogin = resposta.data
               this.listarUsuario()
@@ -312,13 +371,18 @@ export default {
 
 
        /*
-        * Métodos Listar, Pesquisar, salvar e atualizar associados com a entidade Processo e os serviços Spring Rest
+        * Métodos Listar, Pesquisar, salvar e atualizar associados com a entidade Processo e os serviços Spring Boot JPA / Rest
        */
           listarProcesso(){
             if(this.usuarioLogin.perfilUsuario!=='ADMIN'){
               Processo.pesquisarProcessoUsuarioLogin(this.usuarioLogin.email).then(resposta => {
                 this.processos = resposta.data
               })
+              if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
+                Usuario.listaUsuarioPerfil('FINALIZADOR').then(resposta => {
+                  this.usuariosPerfil = resposta.data
+                })
+              }
             }else{
               Processo.listarProcesso().then(resposta => {
                 this.processos = resposta.data
@@ -326,41 +390,48 @@ export default {
             }
           },          
 
-          salvarProcesso(){
-            
+          salvarProcesso(){            
               this.errors = []
-              
-              if (!this.usuario.nome) {
-                this.errors.push('Nome é obrigatório');
-              }        
-              if (this.validaEmail(this.usuario.email)===false) {
-                this.errors.push('Verifique o campo Email');
+              if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
+                  if (!this.processo.num_processo) {
+                    this.errors.push('Número é obrigatório');
+                  }        
+                  if (!this.processo.ds_processo) {
+                    this.errors.push('Descrição é Obrigatório');
+                  }
+                  if (!this.selectedUsuarioPerfil) {
+                    this.errors.push('Usuário é obrigatório');
+                  }        
+               }
+               if(this.usuarioLogin.perfilUsuario==='FINALIZADOR'){
+                  if (!this.processo.parecer) {
+                    this.errors.push('Parecer é obrigatório');
+                  }     
               }
-              if (!this.usuario.perfilUsuario) {
-                this.errors.push('Perfil é obrigatório');
-              }        
 
               if(this.errors.length===0){
-                  if(!this.usuario.cd_usuario){
-                    document.getElementById('status').style.display='none'
-                    Usuario.salvarUsuario(this.usuario).then(response => {
+                  if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
+                    this.processo.cd_usuario_finaliza=this.selectedUsuarioPerfil
+                    this.processo.cd_usuario_cadastro=this.usuarioLogin.cd_usuario
+                  }
+                  if(!this.processo.cd_processo){
+                    Processo.salvarProcesso(this.processo).then(response => {
                       response
-                      this.usuario={}
+                      this.processo={}
                       alert('Salvo com sucesso!')
-                      this.listarUsuario()
-                      this.closeModal('modalUser')
+                      this.listarProcesso()
+                      this.closeModal('modalProcesso')
                     }).catch(error => {
                         console.log(error)
                     })
                   }else{ 
-                    this.errors=[]
-                    document.getElementById('status').style.display='initial'
-                    Usuario.atualizarUsuario(this.usuario).then(resposta => {
+                    this.errors=[]                    
+                    Processo.atualizarProcesso(this.processo).then(resposta => {
                       resposta
-                      this.usuario={}            
+                      this.processo={}            
                       alert('Atualizado com sucesso!')
-                      this.listarUsuario()
-                      this.closeModal('modalUser')
+                      this.listarProcesso()
+                      this.closeModal('modalProcesso')
                     }).catch((error) => {
                         console.log(error)
                     })
@@ -371,7 +442,7 @@ export default {
 
             editarProcesso(processo){
               this.showModal('modalProcesso')  
-              document.getElementById('status').style.display='initial'      
+              //document.getElementById('status').style.display='initial'      
               this.processo=processo
             },
 
@@ -398,7 +469,16 @@ export default {
     padding: 12px;
 }
 .modalUser{
-  border:1px solid #999;top:150px;width:500px;height:450px;z-index:9999
+  border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999
+}
+.modalProcesso{
+  border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999
+}
+.addProcess{
+  font-size:25px !important;color: #039be5;
+}
+.iconProcess{
+  font-size:50px !important;line-height:50px;
 }
 .divSearch{
   text-align: right;

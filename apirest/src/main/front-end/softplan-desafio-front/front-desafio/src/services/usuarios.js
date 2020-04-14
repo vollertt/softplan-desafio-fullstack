@@ -11,6 +11,16 @@ export default {
         })
     },
 
+
+    listaUsuarioPerfil:(perfilUsuario) => {
+        perfilUsuario
+        return http.get('usuarioPerfil', {
+            params: {
+                perfilUsuario: perfilUsuario
+            }
+        })
+    },
+
     listarUsuario:() => {
         return http.get('usuarios')
     },

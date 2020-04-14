@@ -1,5 +1,6 @@
 package com.desafiosoftplan.apirest.resources;
 
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -70,13 +71,19 @@ public class ProcessoResource {
 	
 	@PostMapping("/processo")
 	@ApiOperation(value="Cadastra novo processo")
-	public Processo salvaNovoProcesso(@RequestBody Processo processo){
+	public Processo salvaNovoProcesso(@RequestBody Processo processo){		
 		return processoRepository.save(processo);
 	}	
 	
 	@PutMapping(value="/processo")
 	@ApiOperation(value="Atualiza processo")
 	public Processo atualizaprocesso(@RequestBody Processo processo) {	   
+	   if(processo.isStatus_finalizado()){
+		   if(processo.getDt_parecer_inc()==null) {
+			Date date = new Date();
+			processo.setDt_parecer_inc(date);
+		   }
+	   }
 	   return processoRepository.save(processo);	   
 	}	
 	

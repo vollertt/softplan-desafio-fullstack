@@ -61,6 +61,13 @@ public class UsuarioResource {
 		return usuarioRepository.findByUsuarioLogin(email);
 	}	
 	
+	@GetMapping("/usuarioPerfil")
+	@ApiOperation(value="Busca lista de usuários ativos conforme  Perfil")
+	@ResponseBody
+	public List<Usuario> listaUsuarioPerfil(@RequestParam String perfilUsuario){		
+		return usuarioRepository.findByUsuarioPerfil(perfilUsuario);
+	}
+	
 	@PostMapping("/usuario")
 	@ApiOperation(value="Cadastra e salva novo usuário")
 	public Usuario salvaNovoUsuario(@RequestBody Usuario usuario){
