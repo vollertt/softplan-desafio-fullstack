@@ -94,7 +94,7 @@
           <div>   
             <button v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" data-target="modalProcesso" class="modal-trigger addProcess"><i class="large material-icons iconProcess">book</i>+[{{title}}]</button>                 
           </div>      
-          <div v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" id="modalProcesso" class="modal modalProcesso">
+          <div v-if="this.usuarioLogin.perfilUsuario!=='ADMIN'" id="modalProcesso" class="modal modalProcesso">
             <div class="modal-content">
                   <h5>Cadastro de Processo</h5>
                   <ul>
@@ -102,7 +102,6 @@
                       <b>{{erro}}</b> 
                     </li>
                   </ul>    
-
                   <form @submit.prevent="salvarProcesso">
                     <div v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'">
                         <label>Numero Processo:</label>
@@ -117,7 +116,14 @@
                                       :value="usuarioPerfil.cd_usuario">Nome:{{usuarioPerfil.nome}}     -    Email:{{ usuarioPerfil.email }}</option>
                         </select> 
                     </div>      
-                    <div v-if="this.usuarioLogin.perfilUsuario==='FINALIZADOR'"> 
+                    <div v-if="this.usuarioLogin.perfilUsuario==='FINALIZADOR'">                         
+                        <label>Num Processo:</label>
+                        <span>{{processo.num_processo}}</span><br>
+                        <label>Distribuidor:</label>
+                        <span>{{processo.usuarioCadastro.nome}}</span><br>
+                        <label>Descrição:</label>
+                        <span>{{processo.ds_processo}}</span><br>
+                        <hr>
                         <label>Parecer:</label>
                         <textarea placeholder="Parecer" v-model="processo.parecer"></textarea>
                         <label>Status:</label>
@@ -228,6 +234,7 @@ export default {
 
        /* Método para Alterar de Cadastro de usuário para de Processos */
       linkPro(){
+        this.searchField='';
         if(this.linkProd==='Processos'){
           this.linkProd='Usuários';
           this.title='Cadastro de Processos';
@@ -237,6 +244,8 @@ export default {
         }else{
           this.linkProd='Processos';
           this.title='Cadastro de Usuários';
+          this.processos=[];      
+          this.processo=[];   
           this.listarUsuario();         
         }
       },
@@ -476,6 +485,12 @@ export default {
 }
 .btSearch{
   margin-left:20px;padding:5px;margin-right: 20px;
+}
+label {
+    font-size: 1rem;
+}
+select {
+    border: 1px solid #9e9e9e;
 }
 </style>
 
