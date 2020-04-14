@@ -10,11 +10,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.validator.constraints.Length;
+
 
 import com.sun.istack.NotNull;
 
@@ -43,16 +45,18 @@ public class Processo implements Serializable{
 	private Date dt_parecer_mod;
 	@NotNull
 	@Column(nullable = false)
-	private boolean status_finalizado=false;		
-	@NotNull
-	@Column(name = "cd_usuario_cadastro", nullable = false)
-    @JoinColumn(name="cd_usuario")
-	private long cd_usuario_cadastro;
-	@NotNull
-	@Column(name = "cd_usuario_finaliza", nullable = false)
-	@JoinColumn(name="cd_usuario")
-	private long cd_usuario_finaliza;
+	private boolean status_finalizado=false;	
 	
+	@NotNull
+	@ManyToOne
+    @JoinColumn(name="cd_usuario_cadastro")
+	private Usuario usuarioCadastro;	
+	
+	@NotNull	
+	@ManyToOne
+	@JoinColumn(name="cd_usuario_finaliza")
+	//private long cd_usuario_finaliza;
+	private Usuario usuarioFinaliza;
 	
 	public long getCd_processo() {
 		return cd_processo;
@@ -96,17 +100,17 @@ public class Processo implements Serializable{
 	public void setStatus_finalizado(boolean status_finalizado) {
 		this.status_finalizado = status_finalizado;
 	}
-	public long getCd_usuario_cadastro() {
-		return cd_usuario_cadastro;
+	public Usuario getUsuarioCadastro() {
+		return usuarioCadastro;
 	}
-	public void setCd_usuario_cadastro(long cd_usuario_cadastro) {
-		this.cd_usuario_cadastro = cd_usuario_cadastro;
+	public void setUsuarioCadastro(Usuario usuarioCadastro) {
+		this.usuarioCadastro = usuarioCadastro;
 	}
-	public long getCd_usuario_finaliza() {
-		return cd_usuario_finaliza;
+	public Usuario getUsuarioFinaliza() {
+		return usuarioFinaliza;
 	}
-	public void setCd_usuario_finaliza(long cd_usuario_finaliza) {
-		this.cd_usuario_finaliza = cd_usuario_finaliza;
+	public void setUsuarioFinaliza(Usuario usuarioFinaliza) {
+		this.usuarioFinaliza = usuarioFinaliza;
 	}
 		
 

@@ -24,7 +24,7 @@
       <!--Pagina da aplicação associada ao Cadastro de usuário -->
       <div id="div-user" v-if="this.linkProd==='Processos'" style="display:">  
           <div>         
-            <a v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" v-on:click="showModal('modalUser')" class="addUser" href="#modalUser"><i class="large material-icons iconUser">account_circle</i>+[{{title}}]</a>            
+            <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" v-on:click="showModal('modalUser')" data-target="modalUser" class="modal-trigger addUser"><i class="large material-icons iconUser">account_circle</i>+[{{title}}]</button>
             <div class="divSearch">              
               <input minlength="3" style="width:300px" type="text" placeholder="Busca" v-model="searchField">
               <button @click="pesquisarUsuario()" class="waves-effect btn-small blue darken-1 btSearch"><i class="material-icons center iconSearch">search</i></button>              
@@ -91,8 +91,8 @@
 
       <!--Pagina da aplicação associada ao Cadastro de Processos -->
       <div id="div-process" v-if="this.linkProd==='Usuários'" style="display:" >  
-          <div>        
-            <a v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" class="addProcess" href="#modalUser"><i class="large material-icons iconProcess">book</i>+[{{title}}]</a>
+          <div>   
+            <button v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" data-target="modalProcesso" class="modal-trigger addProcess"><i class="large material-icons iconProcess">book</i>+[{{title}}]</button>                 
           </div>      
           <div id="modalProcesso" class="modal modalProcesso">
             <div class="modal-content">
@@ -154,8 +154,8 @@
                   <td v-if="processo.status_finalizado===true">Finalizado</td><td v-if="processo.status_finalizado===false">Aberto</td>                
                   <td>{{processo.dt_parecer_inc}}</td>
                   <td>{{processo.parecer}}</td>
-                  <td v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">{{processo.cd_usuario_cadastro}}</td>
-                  <td v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">{{processo.cd_usuario_finaliza}}</td>
+                  <td v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">{{processo.usuarioCadastro.nome}}</td>
+                  <td v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">{{processo.usuarioFinaliza.nome}}</td>
                   <td>
                     <button v-if="usuarioLogin.perfilUsuario==='FINALIZADOR' && processo.status_finalizado===false" @click="editarProcesso(processo)" class="waves-effect btn-small blue"><i class="material-icons">create</i></button>
                 </td>
@@ -204,8 +204,8 @@ export default {
          status_finalizado:false,
          parecer:'',
          dt_parecer_inc:'',
-         cd_usuario_cadastro:'',
-         cd_usuario_finaliza:''
+         usuarioCadastro:{},
+         usuarioFinaliza:{}
        },
        selectedUsuarioPerfil:'',
        usuarios: [],
@@ -253,7 +253,7 @@ export default {
         console.log(this.usuario)        
       }else{
         if(!this.processo.cd_processo){
-          this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',cd_usuario_cadastro:'',cd_usuario_finaliza:''}
+          this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
           this.errors=[]
         }
       }
@@ -263,7 +263,7 @@ export default {
        if(this.linkProd==='Processos'){
           this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
        }else{
-         this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',cd_usuario_cadastro:'',cd_usuario_finaliza:''}
+         this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
        }
        this.errors=[]
        document.getElementById(id).style.display='none'
@@ -278,7 +278,7 @@ export default {
             this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
             this.usuarioLogin={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
             this.usuariosPerfil={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
-            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',cd_usuario_cadastro:'',cd_usuario_finaliza:''}
+            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
             this.selectedUsuarioPerfil=''
             this.errors=[]
             this.searchField=''
@@ -405,8 +405,8 @@ export default {
 
               if(this.errors.length===0){
                   if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
-                    this.processo.cd_usuario_finaliza=this.selectedUsuarioPerfil
-                    this.processo.cd_usuario_cadastro=this.usuarioLogin.cd_usuario
+                    this.processo.usuarioFinaliza={cd_usuario:this.selectedUsuarioPerfil}
+                    this.processo.usuarioCadastro=this.usuarioLogin
                   }
                   if(!this.processo.cd_processo){
                     Processo.salvarProcesso(this.processo).then(response => {
@@ -447,34 +447,34 @@ export default {
 
 </script>
 
+
 <style>
 .titleNav{
   height:70px;
   font-size:20px;
 }
-.addUser{
-  font-size:40px !important;color: #039be5;
+.addUser,.addProcess{
+  font-size: 18px !important;
+  color: #039be5;
+  background: none !important;
+  border: none;
+  cursor: pointer
 }
-.iconUser{
-  font-size:70px !important;line-height:70px;
+.iconUser,.iconProcess{
+  font-size:55px !important;line-height:60px;
 }
 .modal .modal-content {
     padding: 12px;
 }
-.modalUser{
+.modalUser,.modalProcesso{
   border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999
-}
-.modalProcesso{
-  border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999
-}
-.addProcess{
-  font-size:25px !important;color: #039be5;
-}
-.iconProcess{
-  font-size:50px !important;line-height:50px;
 }
 .divSearch{
-  text-align: right;
+    text-align: right;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 20px;
+    margin-left: 200px;
 }
 .iconSearch{
   font-size:24px !important;height:24px !important;line-height:24px !important;
