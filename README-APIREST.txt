@@ -39,14 +39,27 @@ Back-end projeto java Spring Boot Maven "apirest"
 Preparação do ambiente para o front-end
 
 - Instalação do Eclipse
+
 - Instalação do Git
+
 - Instalação do servidor Node ( https://nodejs.org/en/download/ )
+
 - Instalação do Vue ( https://cli.vuejs.org/guide/installation.html )
+
 - cria um projeto Vue.js (  https://cli.vuejs.org/guide/creating-a-project.html#vue-create  )
+
 - instala axios JS como dependencia do projeto ( na pasta do projeto criado de front-end  roda comando : 
                                                  npm install axios --save )
+- instalação do vue-moneto para operações com objeto Date (npm install vue-moment )
+
+- instalação do Materializer Css como módulo do vue.js
+    npm install materialize-css@next --save
+    npm install material-design-icons --save
+
 - copiar os arquivos da pasta apirest/src/main/front-end/softplan-desafio-front/front-desafio ao projeto criado Vue.js
-- iniciar o servidor ( na pasta do projeto criado associada ao front-end,   rodar comando :   npm run server )
+
+- iniciar o servidor ( na pasta do projeto criado associada ao front-end,   rodar comando :   npm run serve )
+
 - conforme a porta instalada (default é 8080. Caso já estiver em uso instalará na 8081 como default).
   A aplicação possui um index.html configurado como página inicial, logo o sistema poderá ser acessado 
   diretamente pelo endereço http://localhost:8080

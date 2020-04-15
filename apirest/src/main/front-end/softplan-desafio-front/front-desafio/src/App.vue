@@ -13,7 +13,9 @@
         <div>
              <div style="margin-left:20px;">
               <input minlength="3" style="width:300px;background:white;" type="text" placeholder="Digite Email de Login" v-model="emailLogin">
-              <button @click="buscarUsuarioLogin()" class="waves-effect btn-small blue darken-1 btSearch"><i class="material-icons center iconSearch">account_circle</i></button>
+              <button @click="buscarUsuarioLogin()" class="btn-small blue btSearch">
+                <i class="material-icons center iconSearch">account_circle</i>
+              </button>
               {{this.usuarioLogin.perfilUsuario}}
             </div>
         </div>             
@@ -27,7 +29,7 @@
             <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" v-on:click="showModal('modalUser')" data-target="modalUser" class="modal-trigger addUser"><i class="large material-icons iconUser">account_circle</i>+[{{title}}]</button>
             <div class="divSearch">              
               <input minlength="3" style="width:300px" type="text" placeholder="Busca" v-model="searchField">
-              <button @click="pesquisarUsuario()" class="waves-effect btn-small blue darken-1 btSearch"><i class="material-icons center iconSearch">search</i></button>              
+              <button @click="pesquisarUsuario()" class="btn-small blue btSearch"><i class="material-icons center iconSearch">search</i></button>              
             </div>
           </div>      
           <div id="modalUser" class="modal modalUser" v-if="this.usuarioLogin.perfilUsuario==='ADMIN'">
@@ -56,8 +58,8 @@
                       </select>
                     </div>
                     <br><br>
-                    <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" class="waves-effect waves-light btn-small blue ">Salvar<i class="material-icons left">save</i></button>
-                    <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" type="button" v-on:click="closeModal('modalUser')" class="waves-effect waves-light btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
+                    <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" class="btn-small blue ">Salvar<i class="material-icons left">save</i></button>
+                    <button v-if="this.usuarioLogin.perfilUsuario==='ADMIN'" type="button" v-on:click="closeModal('modalUser')" class="btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
                   </form>
             </div>        
           </div> 
@@ -81,7 +83,7 @@
                 <td v-if="usuario.status===true">Ativo</td><td v-if="usuario.status===false">Desativado</td> 
                 <td>{{usuario.dt_cadastro}}</td>
                 <td>
-                  <button v-if="usuarioLogin.perfilUsuario==='ADMIN'" @click="editarUsuario(usuario)" class="waves-effect btn-small blue"><i class="material-icons">create</i></button>
+                  <button v-if="usuarioLogin.perfilUsuario==='ADMIN'" @click="editarUsuario(usuario)" class="btn-small blue"><i class="material-icons">create</i></button>
                 </td>
               </tr>
             </tbody>      
@@ -133,8 +135,8 @@
                         </select>     
                     </div>                        
                     <br><br>
-                    <button class="waves-effect waves-light btn-small blue ">Salvar<i class="material-icons left">save</i></button>
-                    <button type="button" v-on:click="closeModal('modalProcesso')" class="waves-effect waves-light btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
+                    <button class="btn-small blue">Salvar<i class="material-icons left">save</i></button>
+                    <button type="button" v-on:click="closeModal('modalProcesso')" class="btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
                   </form>
 
             </div>        
@@ -147,7 +149,8 @@
                 <th>Numero</th>
                 <th>Descrição</th>                
                 <th>Status Parecer</th> 
-                <th>Data Parecer</th>
+                <th>Dt Processo</th>
+                <th>Dt Parecer</th>
                 <th>Parecer</th>
                 <th v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">Distribuidor</th>
                 <th v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">Finalizador</th>
@@ -158,12 +161,13 @@
                   <td>{{processo.num_processo}}</td>
                   <td>{{processo.ds_processo}}</td>                
                   <td v-if="processo.status_finalizado===true">Finalizado</td><td v-if="processo.status_finalizado===false">Aberto</td>                
-                  <td>{{processo.dt_parecer_inc}}</td>
+                  <td v-if="processo.dt_processo">{{moment(processo.dt_processo).format('DD/MM/YYYY HH:mm:SS')}}</td><td v-else></td>
+                  <td v-if="processo.dt_parecer">{{moment(processo.dt_parecer).format('DD/MM/YYYY HH:mm:SS')}}</td><td v-else></td>
                   <td>{{processo.parecer}}</td>
                   <td v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">{{processo.usuarioCadastro.nome}}</td>
                   <td v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">{{processo.usuarioFinaliza.nome}}</td>
                   <td>
-                    <button v-if="usuarioLogin.perfilUsuario==='FINALIZADOR' && processo.status_finalizado===false" @click="editarProcesso(processo)" class="waves-effect btn-small blue"><i class="material-icons">create</i></button>
+                    <button v-if="usuarioLogin.perfilUsuario==='FINALIZADOR' && processo.status_finalizado===false" @click="editarProcesso(processo)" class="btn-small blue"><i class="material-icons">create</i></button>
                 </td>
               </tr>
             </tbody>      
@@ -182,6 +186,7 @@
 import Usuario from './services/usuarios'
 import Processo from './services/processos'
 
+import M from 'materialize-css'
 
 export default {
 
@@ -209,7 +214,8 @@ export default {
          ds_processo:'',
          status_finalizado:false,
          parecer:'',
-         dt_parecer_inc:'',
+         dt_processo:'',
+         dt_parecer:'',
          usuarioCadastro:{},
          usuarioFinaliza:{}
        },
@@ -226,6 +232,7 @@ export default {
   },
 
   mounted(){
+    M.AutoInit()
     this.listarUsuario();      
   },
   
@@ -250,7 +257,7 @@ export default {
         }
       },
 
-      showModal: function(id) {      
+      showModal: function(id) {   
         document.getElementById(id).style.display='initial'
         if(this.linkProd==='Processos'){
           if(!this.usuario.cd_usuario){
@@ -262,7 +269,7 @@ export default {
           }  
         }else{
           if(!this.processo.cd_processo){
-            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
+            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_processo:'',dt_parecer:'',usuarioCadastro:{},usuarioFinaliza:{}}
             this.errors=[]
           }
         }
@@ -272,10 +279,14 @@ export default {
         if(this.linkProd==='Processos'){
             this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
         }else{
-          this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
+          this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_processo:'',dt_parecer:'',usuarioCadastro:{},usuarioFinaliza:{}}
         }
         this.errors=[]
         document.getElementById(id).style.display='none'
+      },
+
+      callMessage: function(txt){
+        M.toast({html: txt, classes: 'toastApi'})
       },
 
           /*
@@ -286,7 +297,7 @@ export default {
             this.usuario={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
             this.usuarioLogin={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
             this.usuariosPerfil={cd_usuario:'',nome:'',email:'',status:'',perfilUsuario:'',dt_cadastro:''}
-            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_parecer_inc:'',usuarioCadastro:{},usuarioFinaliza:{}}
+            this.processo={cd_processo:'',num_processo:'',ds_processo:'',status_finalizado:false,parecer:'',dt_processo:'',dt_parecer:'',usuarioCadastro:{},usuarioFinaliza:{}}
             this.selectedUsuarioPerfil=''
             this.errors=[]
             this.searchField=''
@@ -298,6 +309,11 @@ export default {
             Usuario.buscarUsuarioLogin(this.emailLogin).then(resposta => {
               this.usuarioLogin = resposta.data
               this.listarUsuario()
+              if(this.usuarioLogin.cd_usuario){
+                this.callMessage('Logado com Sucesso:' || this.usuarioLogin.nome)
+              }else{
+                this.callMessage('Erro: Verifique dados de Login')
+              }
             })            
           },
           
@@ -313,6 +329,7 @@ export default {
             var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
           },
+          
 
           salvarUsuario(){
             
@@ -334,7 +351,7 @@ export default {
                     Usuario.salvarUsuario(this.usuario).then(response => {
                       response
                       this.usuario={}
-                      alert('Salvo com sucesso!')
+                      this.callMessage('Salvo com sucesso!' || this.usuarioLogin.nome)
                       this.listarUsuario()
                       this.closeModal('modalUser')
                     }).catch(error => {
@@ -346,7 +363,7 @@ export default {
                     Usuario.atualizarUsuario(this.usuario).then(resposta => {
                       resposta
                       this.usuario={}            
-                      alert('Atualizado com sucesso!')
+                      this.callMessage('Atualizado com sucesso!' || this.usuarioLogin.nome)
                       this.listarUsuario()
                       this.closeModal('modalUser')
                     }).catch((error) => {
@@ -419,7 +436,7 @@ export default {
                       Processo.salvarProcesso(this.processo).then(response => {
                         response
                         this.processo={}
-                        alert('Salvo com sucesso!')
+                        this.callMessage('Salvo com sucesso!' || this.usuarioLogin.nome)                        
                         this.listarProcesso()
                         this.closeModal('modalProcesso')
                       }).catch(error => {
@@ -429,8 +446,8 @@ export default {
                       this.errors=[]                    
                       Processo.atualizarProcesso(this.processo).then(resposta => {
                         resposta
-                        this.processo={}            
-                        alert('Atualizado com sucesso!')
+                        this.processo={}       
+                        this.callMessage('Atualizado com sucesso!' || this.usuarioLogin.nome)     
                         this.listarProcesso()
                         this.closeModal('modalProcesso')
                       }).catch((error) => {
@@ -455,24 +472,19 @@ export default {
 
 <style>
 .titleNav{
-  height:70px;
-  font-size:20px;
+  height:70px;font-size:20px;
 }
 .titleTab{
-  color:#000;font-size:17px;font-weight:bolder;
+  color:#757575;font-size:1.4rem;font-weight:600;
 }
 .addUser,.addProcess{
-  font-size: 18px !important;
-  color: #039be5;
-  background: none !important;
-  border: none;
-  cursor: pointer;
+  font-size:18px !important;color:#039be5;background:none !important;border:none;cursor:pointer;
 }
 .iconUser,.iconProcess{
   font-size:55px !important;line-height:60px;
 }
 .modal .modal-content {
-    padding: 12px;
+    padding:12px;
 }
 .modalUser,.modalProcesso{
   border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999;
@@ -484,13 +496,20 @@ export default {
   font-size:24px !important;height:24px !important;line-height:24px !important;
 }
 .btSearch{
-  margin-left:20px;padding:5px;margin-right: 20px;
+  margin-left:20px;padding:5px;margin-right:20px;
 }
 label {
-    font-size: 1rem;
+    font-size:1rem;
 }
 select {
-    border: 1px solid #9e9e9e;
+    border:1px solid #9e9e9e;
 }
+table th{
+    font-size:1.1rem;font-weight:600;color:grey;
+}
+.toastApi{
+  background-color:#1E88E5 !important;
+}
+
 </style>
 

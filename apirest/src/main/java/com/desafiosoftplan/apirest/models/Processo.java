@@ -40,9 +40,9 @@ public class Processo implements Serializable{
 	private String parecer;
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dt_parecer_inc;
+	private Date dt_processo;
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dt_parecer_mod;
+	private Date dt_parecer;
 	@NotNull
 	@Column(nullable = false)
 	private boolean status_finalizado=false;	
@@ -82,17 +82,17 @@ public class Processo implements Serializable{
 	public void setParecer(String parecer) {
 		this.parecer = parecer;
 	}
-	public Date getDt_parecer_inc() {
-		return dt_parecer_inc;
+	public Date getDt_processo() {
+		return dt_processo;
 	}
-	public void setDt_parecer_inc(Date dt_parecer_inc) {
-		this.dt_parecer_inc = dt_parecer_inc;
+	public void setDt_processo(Date dt_processo) {
+		this.dt_processo = dt_processo;
 	}
-	public Date getDt_parecer_mod() {
-		return dt_parecer_mod;
+	public Date getDt_parecer() {
+		return dt_parecer;
 	}
-	public void setDt_parecer_mod(Date dt_parecer_mod) {
-		this.dt_parecer_mod = dt_parecer_mod;
+	public void setDt_parecer(Date dt_parecer) {
+		this.dt_parecer = dt_parecer;
 	}
 	public boolean isStatus_finalizado() {
 		return status_finalizado;
