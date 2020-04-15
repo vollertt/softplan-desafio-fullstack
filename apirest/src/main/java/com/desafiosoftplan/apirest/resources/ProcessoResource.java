@@ -62,12 +62,20 @@ public class ProcessoResource {
 		return processoRepository.findByDescricaoProcesso("%"+dsProcesso+"%");
 	}	
 	
-	@GetMapping("/processoBuscaUsuarioLogin")
-	@ApiOperation(value="Busca Processo pelo usuário Logado")
+	@GetMapping("/processoBuscaStatus")
+	@ApiOperation(value="Busca Processo pelo Status do Parecer : true=finalizado, false=aberto")
 	@ResponseBody
-	public List<Processo> listaProcessosUsuarioLogin(@RequestParam String email){		
-		return processoRepository.findByUsuarioLogin(email);
+	public List<Processo> listaProcessosUsuarioDistribuidor(@RequestParam Boolean status){		
+		return processoRepository.findByProcessoStatus(status);
 	}
+	
+	@GetMapping("/processoBuscaFinalizador")
+	@ApiOperation(value="Busca Processo do usuário Finalizador Logado e Status do Parecer : true=finalizado, false=aberto")
+	@ResponseBody
+	public List<Processo> listaProcessosUsuarioParecer(@RequestParam String email, @RequestParam Boolean status){		
+		return processoRepository.findByUsuarioParecer(email,status);
+	}
+	
 	
 	@PostMapping("/processo")
 	@ApiOperation(value="Cadastra novo processo")

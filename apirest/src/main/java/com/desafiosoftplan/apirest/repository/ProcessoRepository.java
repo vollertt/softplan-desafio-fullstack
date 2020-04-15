@@ -18,7 +18,10 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long>{
     @Query(value="SELECT * FROM processo WHERE Lower(ds_processo) like Lower(:dsProcesso)" , nativeQuery = true) 
     List<Processo> findByDescricaoProcesso(@Param("dsProcesso") String dsProcesso);  
     
-    @Query(value="SELECT * FROM processo p, usuario u WHERE ( (p.cd_usuario_finaliza = u.cd_usuario or  p.cd_usuario_cadastro = u.cd_usuario) and u.email like :email )  " , nativeQuery = true) 
-    List<Processo> findByUsuarioLogin(@Param("email") String email); 
+    @Query(value="SELECT * FROM processo p, usuario u WHERE u.cd_usuario=p.cd_usuario_cadastro and p.status_finalizado = :status Order by u.nome" , nativeQuery = true) 
+    List<Processo> findByProcessoStatus(@Param("status") Boolean status); 
+    
+    @Query(value="SELECT * FROM processo p, usuario u WHERE ( p.cd_usuario_finaliza = u.cd_usuario) and u.email like :email and p.status_finalizado = :status Order by p.parecer DESC" , nativeQuery = true) 
+    List<Processo> findByUsuarioParecer(@Param("email") String email, @Param("status") Boolean status); 
 
 }

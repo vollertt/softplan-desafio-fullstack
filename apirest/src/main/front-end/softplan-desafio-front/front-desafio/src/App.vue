@@ -95,11 +95,19 @@
 
       <!--Pagina da aplicação associada ao Cadastro de Processos -->
       <div id="div-process" v-if="this.linkProd==='Usuários'" style="display:" >  
-          <div>   
-            <button v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" data-target="modalProcesso" class="modal-trigger addProcess"><i class="large material-icons iconProcess">book</i>+[{{title}}]</button>                 
-          </div>      
+          <div>
+            <div style="float:left;">   
+              <button v-if="this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'" v-on:click="showModal('modalProcesso')" data-target="modalProcesso" class="modal-trigger addProcess"><i class="large material-icons iconProcess">book</i>+[{{title}}]</button>                 
+            </div>      
+            <div id="filtro_processo" style="float:right;">   
+                <br>         
+                <label><input name="statusProcesso" v-on:click="atualizarListaProcesso(false)" type="radio" value="false" checked /><span>Pendentes</span></label>
+                <label><input name="statusProcesso" v-on:click="atualizarListaProcesso(true)" type="radio" value="true" /><span>Finalizados</span></label>            
+            </div>
+          </div>
           <div v-if="this.usuarioLogin.perfilUsuario!=='ADMIN'" id="modalProcesso" class="modal modalProcesso">
             <div class="modal-content">
+              <div id="cadastroProcesso">
                   <h5>Cadastro de Processo</h5>
                   <ul>
                     <li v-for="(erro,index) of errors" :key="index">
@@ -140,11 +148,11 @@
                     <button class="btn-small blue">Salvar<i class="material-icons left">save</i></button>
                     <button type="button" v-on:click="closeModal('modalProcesso')" class="btn-small blue ">Cancelar<i class="material-icons left">cancel</i></button>
                   </form>
-
+               </div>
             </div>        
           </div>  
-          <br> 
-          <center><label class="titleTab">Lista de Processos</label></center>     
+          <br><br><br><br>            
+          <center><label class="titleTab">Lista de Processos</label></center>   
           <table>
             <thead>
               <tr>
@@ -154,7 +162,7 @@
                 <th>Dt Processo</th>
                 <th>Dt Parecer</th>
                 <th>Parecer</th>
-                <th v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">Distribuidor</th>
+                <th>Distribuidor</th>
                 <th v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">Finalizador</th>
               </tr>
             </thead>
@@ -166,7 +174,7 @@
                   <td v-if="processo.dt_processo">{{moment(processo.dt_processo).format('DD/MM/YYYY HH:mm:SS')}}</td><td v-else></td>
                   <td v-if="processo.dt_parecer">{{moment(processo.dt_parecer).format('DD/MM/YYYY HH:mm:SS')}}</td><td v-else></td>
                   <td>{{processo.parecer}}</td>
-                  <td v-if="usuarioLogin.perfilUsuario!=='DISTRIBUIDOR'">{{processo.usuarioCadastro.nome}}</td>
+                  <td>{{processo.usuarioCadastro.nome}}</td>
                   <td v-if="usuarioLogin.perfilUsuario!=='FINALIZADOR'">{{processo.usuarioFinaliza.nome}}</td>
                   <td>
                     <button v-if="usuarioLogin.perfilUsuario==='FINALIZADOR' && processo.status_finalizado===false" @click="editarProcesso(processo)" class="btn-small blue"><i class="material-icons">create</i></button>
@@ -229,7 +237,8 @@ export default {
        searchField:'',
        emailLogin:'',
        title:'Cadastro de Usuário',
-       linkProd:'Processos'
+       linkProd:'Processos',
+       statusProcesso:false
      }
   },
 
@@ -249,6 +258,7 @@ export default {
           this.title='Cadastro de Processos';
           this.usuarios=[];
           this.usuario=[];
+          this.statusProcesso=false;
           this.listarProcesso();         
         }else{
           this.linkProd='Processos';
@@ -307,7 +317,8 @@ export default {
             this.linkProd='Processos'
             this.errors=[]
             this.processos=[]
-            this.usuarios=[];            
+            this.usuarios=[]
+            this.statusProcesso=false            
             Usuario.buscarUsuarioLogin(this.emailLogin).then(resposta => {
               this.usuarioLogin = resposta.data
               this.listarUsuario()
@@ -394,21 +405,26 @@ export default {
             *  Métodos Listar, Pesquisar, salvar e atualizar associados com a entidade 
             *  Processo e os serviços Spring Boot JPA / Rest
             */
+
+            atualizarListaProcesso(status_){
+              this.statusProcesso=status_;
+              this.listarProcesso();
+            },
+
             listarProcesso(){
-              if(this.usuarioLogin.perfilUsuario!=='ADMIN'){
-                Processo.pesquisarProcessoUsuarioLogin(this.usuarioLogin.email).then(resposta => {
+              this.processos=[];
+              if(this.usuarioLogin.perfilUsuario==='FINALIZADOR'){                  
+                Processo.pesquisarProcessoFinalizador(this.usuarioLogin.email,this.statusProcesso).then(resposta => {
                   this.processos = resposta.data
                 })
-                if(this.usuarioLogin.perfilUsuario==='DISTRIBUIDOR'){
-                  Usuario.listaUsuarioPerfil('FINALIZADOR').then(resposta => {
-                    this.usuariosPerfil = resposta.data
-                  })
-                }
               }else{
-                Processo.listarProcesso().then(resposta => {
+                Processo.pesquisarProcessoStatus(this.statusProcesso).then(resposta => {
                   this.processos = resposta.data
                 })
-              }
+                Usuario.listaUsuarioPerfil('FINALIZADOR').then(resposta => {
+                  this.usuariosPerfil = resposta.data
+                })
+              }  
             },          
 
             salvarProcesso(){            
@@ -483,7 +499,7 @@ export default {
   float:right;margin-right:40px;display:flex;
 }
 .titleTab{
-  color:#757575;font-size:1.4rem;font-weight:600;
+  color:#757575;font-size:1.4rem !important;font-weight:600;
 }
 .addUser,.addProcess{
   font-size:18px !important;color:#039be5;background:none !important;border:none;cursor:pointer;
@@ -495,7 +511,7 @@ export default {
     padding:12px;
 }
 .modalUser,.modalProcesso{
-  border:1px solid #999;top:150px;width:500px;height:500px;z-index:9999;
+  border:1px solid #999;top:150px;width:550px !important;height:500px;z-index:9999;
 }
 .divSearch{
     float:right;
@@ -510,13 +526,16 @@ export default {
   background-color:#1E88E5 !important;
 }
 label {
-    font-size:1rem;
+    font-size:1rem !important;
 }
 select {
     border:1px solid #9e9e9e;
 }
 table th{
     font-size:1.1rem;font-weight:600;color:grey;
+}
+[type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:after {
+    background-color: #1E88E5 !important;
 }
 
 </style>
