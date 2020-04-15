@@ -6,7 +6,7 @@
     <nav>
       <div class="nav-wrapper blue darken-1">   
         <span class="brand-logo center titleNav">Desafio Softplan </span>   
-        <div style="float:right;margin-right:40px;display:flex;">           
+        <div v-if="this.usuarioLogin.cd_usuario" class="linkProd">           
            <a href="#" @click.prevent="linkPro()" class="">{{linkProd}}</a>  
            <i class="material-icons">link</i>        
         </div>
@@ -23,6 +23,8 @@
     </nav>
 
     <div class="container">
+      <span v-if="!this.usuarioLogin.cd_usuario" class="pageIni">Desafio SoftPlan FullStack</span>
+      <div v-if="this.usuarioLogin.cd_usuario">
       <!--Pagina da aplicação associada ao Cadastro de usuário -->
       <div id="div-user" v-if="this.linkProd==='Processos'" style="display:">  
           <div>         
@@ -173,7 +175,7 @@
             </tbody>      
           </table>
       </div> 
-
+    </div>
     </div>
 
   </div>
@@ -471,8 +473,14 @@ export default {
 
 
 <style>
+.pageIni{
+  width:100%;display:block;font-size:5em;color:blue;vh:80%;line-height:80vh;text-align:center;
+}
 .titleNav{
   height:70px;font-size:20px;
+}
+.linkProd{
+  float:right;margin-right:40px;display:flex;
 }
 .titleTab{
   color:#757575;font-size:1.4rem;font-weight:600;
@@ -498,6 +506,9 @@ export default {
 .btSearch{
   margin-left:20px;padding:5px;margin-right:20px;
 }
+.toastApi{
+  background-color:#1E88E5 !important;
+}
 label {
     font-size:1rem;
 }
@@ -506,9 +517,6 @@ select {
 }
 table th{
     font-size:1.1rem;font-weight:600;color:grey;
-}
-.toastApi{
-  background-color:#1E88E5 !important;
 }
 
 </style>
